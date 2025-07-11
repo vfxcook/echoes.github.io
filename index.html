@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: 'Palatino', 'Times New Roman', serif;
+            font-family: 'Arial', 'Helvetica', 'Segoe UI', 'Roboto', sans-serif;
             background: #000;
             color: #e0e0e0;
             overflow-x: hidden;
@@ -699,7 +699,7 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(138, 43, 226, 0.3);
             padding: 1rem 0;
-            transition: transform 0.3s ease;
+            //transition: transform 0.3s ease;
         }
 
         nav {
@@ -1401,11 +1401,16 @@
             background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(30, 30, 60, 0.9));
             border: 2px solid #8A2BE2;
             border-radius: 25px;
-            padding: 5rem 3rem;
+            padding: 3rem; 
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(20px);
         }
+
+        .section.cta {
+    padding: 3rem 2rem;  /* ← Override padding for CTA section only */
+    min-height: auto;    /* ← Also remove the min-height so it doesn't force 100vh */
+}
 
         .cta::before {
             content: '';
@@ -2106,18 +2111,18 @@
         }
 
         // Check on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (detectMobileDevice()) {
-                showMobileWarning();
-            }
-        });
+            document.addEventListener('DOMContentLoaded', () => {
+                if (detectMobile()) {  // ← Changed to detectMobile()
+                    showMobileWarning();
+                }
+            });
 
-        // Check on window resize
-        window.addEventListener('resize', () => {
-            if (detectMobileDevice() && !document.body.classList.contains('mobile-blocked')) {
-                showMobileWarning();
-            }
-        });
+            // Check on window resize
+            window.addEventListener('resize', () => {
+                if (detectMobile() && !document.body.classList.contains('mobile-blocked')) {  // ← Changed to detectMobile()
+                    showMobileWarning();
+                }
+            });
 
         // Interval IDs for cleanup
         let crowSoundInterval;
@@ -2380,14 +2385,14 @@
             }
             
             // Header hide/show
-            const header = document.querySelector('header');
-            if (header) {
-                if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    header.style.transform = 'translateY(-100%)';
-                } else {
-                    header.style.transform = 'translateY(0)';
-                }
-            }
+           // const header = document.querySelector('header');
+           // if (header) {
+           //     if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          //          header.style.transform = 'translateY(-100%)';
+         //       } else {
+          //          header.style.transform = 'translateY(0)';
+         //       }
+         //   }
             
             // Trigger scream at end
             if (!hasPlayedScream && 
@@ -3113,13 +3118,39 @@
         // Add event listeners to mechanics card
         document.addEventListener('DOMContentLoaded', () => {
             const mechanicsCard = document.querySelector('.mechanics-card');
-            if (mechanicsCard) {
-                mechanicsCard.addEventListener('mouseenter', showMechanicsPopup);
-                mechanicsCard.addEventListener('mouseleave', hideMechanicsPopup);
+            const popup = document.getElementById('mechanicsPopup');
+            const overlay = document.getElementById('mechanicsOverlay');
+            
+            let hoverTimeout;
+            
+            if (mechanicsCard && popup) {
+                // Show popup on card hover
+                mechanicsCard.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimeout);
+                    showMechanicsPopup();
+                });
+                
+                // Delay hiding when leaving card
+                mechanicsCard.addEventListener('mouseleave', () => {
+                    hoverTimeout = setTimeout(() => {
+                        hideMechanicsPopup();
+                    }, 200); // 200ms delay
+                });
+                
+                // Keep popup open when hovering over popup itself
+                popup.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimeout);
+                });
+                
+                // Hide when leaving popup
+                popup.addEventListener('mouseleave', () => {
+                    hoverTimeout = setTimeout(() => {
+                        hideMechanicsPopup();
+                    }, 200);
+                });
             }
             
             // Close popup when clicking overlay
-            const overlay = document.getElementById('mechanicsOverlay');
             if (overlay) {
                 overlay.addEventListener('click', hideMechanicsPopup);
             }
